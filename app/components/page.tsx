@@ -1,129 +1,228 @@
 "use client";
 
-import { Copy, Search } from "lucide-react";
+import { ArrowRight, Search, Filter, X } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
+import { BackgroundEffects } from "@/components/ui/background-effects";
 
-const components = [
-  {
-    name: "Button",
-    category: "Basic",
-    code: `<button class="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity">
-  Button
-</button>`,
-    preview: (
-      <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity">
-        Button
-      </button>
-    ),
-  },
-  {
-    name: "Badge",
-    category: "Basic",
-    code: `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
-  Badge
-</span>`,
-    preview: (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
-        Badge
-      </span>
-    ),
-  },
-  {
-    name: "Card",
-    category: "Layout",
-    code: `<div class="p-6 rounded-lg bg-card border border-border">
-  <h3 class="text-xl font-semibold mb-2">Card Title</h3>
-  <p class="text-muted-foreground">Card content goes here.</p>
-</div>`,
-    preview: (
-      <div className="p-6 rounded-lg bg-card border border-border">
-        <h3 className="text-xl font-semibold mb-2">Card Title</h3>
-        <p className="text-muted-foreground">Card content goes here.</p>
-      </div>
-    ),
-  },
-];
+interface Component {
+  title: string;
+  description: string;
+  componentCount: number;
+  href: string;
+  preview: string;
+  category: string;
+  status: "stable" | "beta" | "new";
+}
 
 export default function ComponentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
+  const components: Component[] = [
+    {
+      title: "Alerts",
+      description: "Feedback messages for user actions and system states",
+      componentCount: 9,
+      href: "/components/alerts",
+      preview: "/previews/alerts.png",
+      category: "Feedback",
+      status: "stable",
+    },
+    {
+      title: "Avatars",
+      description: "User profile pictures and decorative elements",
+      componentCount: 10,
+      href: "/components/avatars",
+      preview: "/previews/avatars.png",
+      category: "Data Display",
+      status: "stable",
+    },
+    {
+      title: "Breadcrumbs",
+      description: "Navigation aids showing the current page hierarchy",
+      componentCount: 5,
+      href: "/components/breadcrumbs",
+      preview: "/previews/breadcrumbs.png",
+      category: "Navigation",
+      status: "stable",
+    },
+    {
+      title: "Buttons",
+      description: "Interactive elements for user actions",
+      componentCount: 10,
+      href: "/components/buttons",
+      preview: "/previews/buttons.png",
+      category: "Interactive",
+      status: "stable",
+    },
+    {
+      title: "Cards",
+      description: "Containers for related content and actions",
+      componentCount: 8,
+      href: "/components/cards",
+      preview: "/previews/cards.png",
+      category: "Containers",
+      status: "stable",
+    },
+    {
+      title: "Forms",
+      description: "Input components and form layouts",
+      componentCount: 12,
+      href: "/components/forms",
+      preview: "/previews/forms.png",
+      category: "Forms",
+      status: "stable",
+    },
+    {
+      title: "Navigation",
+      description: "Menus, tabs, and other navigation elements",
+      componentCount: 7,
+      href: "/components/navigation",
+      preview: "/previews/navigation.png",
+      category: "Navigation",
+      status: "stable",
+    },
+    {
+      title: "Tables",
+      description: "Data presentation and management components",
+      componentCount: 6,
+      href: "/components/tables",
+      preview: "/previews/tables.png",
+      category: "Data Presentation",
+      status: "stable",
+    },
+  ];
+
   const categories = ["All", ...new Set(components.map((c) => c.category))];
 
   const filteredComponents = components.filter((component) => {
-    const matchesSearch = component.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      component.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      component.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
       selectedCategory === "All" || component.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const copyToClipboard = (code: string) => {
-    navigator.clipboard.writeText(code);
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-4xl font-bold mb-8">Components</h1>
+    <div className="relative min-h-screen">
+      <BackgroundEffects />
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search components..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-input border border-border focus:outline-none focus:ring-2 focus:ring-primary"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <select
-            className="px-4 py-2 rounded-lg bg-input border border-border focus:outline-none focus:ring-2 focus:ring-primary"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="grid grid-cols-1 gap-8">
-          {filteredComponents.map((component, index) => (
-            <div
-              key={index}
-              className="p-6 rounded-lg bg-card border border-border"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold">{component.name}</h2>
-                <span className="px-3 py-1 rounded-full text-sm bg-accent text-accent-foreground">
-                  {component.category}
-                </span>
+      {/* Header with Search - updated with backdrop blur */}
+      <header className="sticky top-0 z-50 border-b border-border glass-effect-2 !shadow-none">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Components</h1>
+              <p className="text-muted-foreground">
+                Build your next project faster with our beautiful components
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <div className="relative flex-1 md:min-w-[300px]">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search components..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-background py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                  >
+                    <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </button>
+                )}
               </div>
-
-              <div className="mb-6 p-8 flex items-center justify-center rounded bg-accent/50">
-                {component.preview}
-              </div>
-
               <div className="relative">
-                <pre className="p-4 rounded-lg bg-accent overflow-x-auto">
-                  <code className="text-sm">{component.code}</code>
-                </pre>
-                <button
-                  onClick={() => copyToClipboard(component.code)}
-                  className="absolute top-2 right-2 p-2 rounded-lg hover:bg-background/50"
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="h-full rounded-lg border border-border bg-background py-2 pl-10 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
                 >
-                  <Copy className="w-4 h-4" />
-                </button>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+                <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               </div>
             </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content - updated with background styles */}
+      <main className="relative max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredComponents.map((component) => (
+            <Link
+              key={component.title}
+              href={component.href}
+              className="group relative flex flex-col overflow-hidden rounded-xl border border-border hover:border-primary transition-all duration-300 hover:shadow-lg glass-effect-2"
+            >
+              {/* Status Badge */}
+              {component.status === "new" && (
+                <span className="absolute right-4 top-4 rounded-full bg-green-500/10 px-2 py-1 text-xs font-medium text-green-500">
+                  New
+                </span>
+              )}
+
+              {/* Preview */}
+              <div className="aspect-[4/3] overflow-hidden bg-muted/30 p-4">
+                <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border bg-background/50">
+                  <span className="text-sm text-muted-foreground">Preview</span>
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="flex flex-col p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-lg">{component.title}</h3>
+                  <span className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-muted">
+                    {component.componentCount} variants
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {component.description}
+                </p>
+                <div className="mt-auto flex items-center text-sm font-medium text-primary">
+                  Explore components
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </Link>
           ))}
         </div>
-      </div>
+
+        {/* Empty State - updated with background styles */}
+        {filteredComponents.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="rounded-full bg-muted/50 backdrop-blur-sm p-4 mb-4">
+              <Search className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No components found</h3>
+            <p className="text-muted-foreground mb-4">
+              Try adjusting your search or filter to find what you're looking
+              for.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("All");
+              }}
+              className="text-sm text-primary hover:underline"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
